@@ -1,0 +1,154 @@
+=========================================================
+theFlow! — How to build and install the .rpm package
+Fedora / RHEL 9 / Rocky Linux 9 / CentOS Stream 9 (x86_64)
+=========================================================
+
+
+STEP 1 — Install system dependencies
+--------------------------------------
+sudo dnf install gcc rpm-build rpmlint
+sudo dnf install mesa-libGL libGL python3-pip
+
+
+STEP 2 — Install Python dependencies
+--------------------------------------
+pip3 install PyQt6 PyQt6-Qt6 PyQt6-sip pyinstaller Pillow
+
+
+STEP 3 — Make sure your project folder has this structure
+----------------------------------------------------------
+theflow/
+├── main_linux.py
+├── rthook_linux.py
+├── theflow_linux.spec
+├── theflow.spec             <- RPM spec
+├── theflow.desktop
+├── build_rpm.sh
+├── backdrop.py
+├── config.py
+├── curve.py
+├── logo.py
+├── menu.py
+├── node.py
+├── note.py
+├── paint.py
+├── scene_logic.py
+├── settings.py
+├── ui_components.py
+├── utils.py
+├── view_logic.py
+├── logo/
+│   ├── logo.svg
+│   └── theFlow_white.svg
+├── icons/
+│   └── icon.png
+├── documentation/
+│   └── theFlow_manual.html
+└── settings/          <- create this if it doesn't exist
+
+
+STEP 4 — Create the settings folder if missing
+-----------------------------------------------
+mkdir -p settings
+
+
+STEP 5 — Build the binary
+--------------------------
+pyinstaller theflow_linux.spec
+
+Output will be at: dist/theflow
+
+
+STEP 6 — Set up the RPM build tree
+------------------------------------
+mkdir -p ~/rpmbuild/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
+
+
+STEP 7 — Package the binary into a tarball
+-------------------------------------------
+tar -czf ~/rpmbuild/SOURCES/theflow-0.1.0.tar.gz -C dist theflow
+
+
+STEP 8 — Copy files into place
+--------------------------------
+cp icons/icon.png                      ~/rpmbuild/SOURCES/icon.png
+cp theflow.desktop                     ~/rpmbuild/SOURCES/theflow.desktop
+cp documentation/theFlow_manual.html   ~/rpmbuild/SOURCES/theFlow_manual.html
+cp theflow.spec                        ~/rpmbuild/SPECS/theflow.spec
+
+
+STEP 9 — Build the RPM
+------------------------
+rpmbuild -bb ~/rpmbuild/SPECS/theflow.spec
+
+
+STEP 10 — Find the exact RPM path
+-----------------------------------
+find ~/rpmbuild/RPMS -name "*.rpm"
+
+It will print something like:
+/home/youruser/rpmbuild/RPMS/x86_64/theflow-0.1.0-1.el9.x86_64.rpm
+
+
+STEP 11 — Install it
+----------------------
+sudo rpm -i ~/rpmbuild/RPMS/x86_64/theflow-0.1.0-1.el9.x86_64.rpm
+
+
+STEP 12 — Refresh icon cache
+------------------------------
+sudo gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+sudo update-desktop-database
+
+
+STEP 13 — Run it
+-----------------
+theflow
+
+
+=========================================================
+UNINSTALL
+=========================================================
+sudo rpm -e theflow
+
+
+=========================================================
+TROUBLESHOOTING
+=========================================================
+
+App does not launch
+  -> Run from terminal: theflow
+  -> Check error output
+
+Blank window or no display
+  -> QT_QPA_PLATFORM=xcb theflow
+
+Audio or video not playing
+  -> Do NOT rebuild with strip=True or upx=True
+  -> It corrupts the FFmpeg libraries inside the binary
+
+Missing libGL error
+  -> sudo dnf install mesa-libGL
+
+Icon not showing in launcher
+  -> sudo gtk-update-icon-cache -f /usr/share/icons/hicolor
+  -> sudo update-desktop-database
+
+Manual not found
+  -> Make sure documentation/theFlow_manual.html exists before building
+  -> Rebuild the binary with pyinstaller theflow_linux.spec
+
+Dialogs attached to main window when dragging
+  -> All QDialog instances must use None as parent on Linux
+
+rpmbuild permission error
+  -> Do NOT run rpmbuild as root
+
+=========================================================
+NOTES
+=========================================================
+
+- Settings are saved to: ~/.config/theflow/settings.json
+- The binary is large (~200-300 MB) because FFmpeg is bundled inside
+- Do NOT use UPX or strip — they corrupt the FFmpeg shared libraries
+- The same dist/theflow binary works for both RPM and DEB packaging

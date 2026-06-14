@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>theFlow! — User Manual</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:        #1b1b1b;
+    --sidebar:   #141414;
+    --panel:     #232323;
+    --border:    #2e2e2e;
+    --accent:    #4a9eff;
+    --accent2:   #2d7dd2;
+    --text:      #e0e0e0;
+    --muted:     #888;
+    --code-bg:   #0d0d0d;
+    --tag-bg:    #1e2a3a;
+    --sidebar-w: 280px;
+    --header-h:  56px;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    display: flex;
+    min-height: 100vh;
+  }
+
+  /* ── Sidebar ──────────────────────────────────────────── */
+  #sidebar {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    width: var(--sidebar-w);
+    background: var(--sidebar);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 100;
+  }
+
+  #sidebar-header {
+    padding: 20px 20px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #sidebar-header h1 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.3px;
+  }
+
+  #sidebar-header p {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  #sidebar-search {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  #search-input {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-size: 13px;
+    padding: 7px 10px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  #search-input:focus { border-color: var(--accent); }
+  #search-input::placeholder { color: var(--muted); }
+
+  #nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px 0 24px;
+  }
+  #nav::-webkit-scrollbar { width: 4px; }
+  #nav::-webkit-scrollbar-track { background: transparent; }
+  #nav::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  #nav a {
+    display: flex;
+    align-items: center;
+    padding: 11px 20px;
+    font-size: 15px;
+    color: #aaa;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+    transition: color 0.15s, background 0.15s, border-color 0.15s;
+  }
+  #nav a:hover { color: #fff; background: rgba(255,255,255,0.04); }
+  #nav a.active {
+    color: var(--accent);
+    border-left-color: var(--accent);
+    background: rgba(74,158,255,0.07);
+  }
+
+  /* sub-links (h3 within sections) */
+  #nav a.sub {
+    padding: 9px 20px 9px 38px;
+    font-size: 13px;
+    color: #777;
+  }
+  #nav a.sub:hover { color: #ccc; }
+  #nav a.sub.active { color: var(--accent); border-left-color: var(--accent); }
+
+  /* Collapsible group */
+  .nav-group { }
+
+  .nav-group-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: color 0.15s;
+  }
+  .nav-group-header:hover { color: #bbb; }
+
+  .nav-group-arrow {
+    font-size: 26px;
+    transition: transform 0.2s;
+    color: var(--accent);
+    opacity: 0.8;
+    line-height: 1;
+  }
+  .nav-group.collapsed .nav-group-arrow { transform: rotate(-90deg); }
+
+  .nav-group-items {
+    overflow: hidden;
+    transition: max-height 0.25s ease;
+    max-height: 1200px;
+  }
+  .nav-group.collapsed .nav-group-items { max-height: 0; }
+
+  /* ── Main content ─────────────────────────────────────── */
+  #content {
+    margin-left: var(--sidebar-w);
+    flex: 1;
+    max-width: 860px;
+    padding: 60px 64px 120px;
+  }
+
+  /* ── Sections ─────────────────────────────────────────── */
+  .section {
+    padding-top: 24px;
+    margin-bottom: 0;
+  }
+
+  .section + .section { border-top: 1px solid var(--border); margin-top: 56px; padding-top: 56px; }
+
+  h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 20px;
+    letter-spacing: -0.4px;
+    scroll-margin-top: 32px;
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ddd;
+    margin: 36px 0 12px;
+    scroll-margin-top: 32px;
+    padding-left: 12px;
+    border-left: 3px solid var(--accent);
+  }
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    margin: 28px 0 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 12px;
+  }
+
+  p { margin-bottom: 14px; color: #ccc; }
+
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  /* ── Lists ────────────────────────────────────────────── */
+  ul, ol {
+    margin: 0 0 16px 0;
+    padding-left: 22px;
+    color: #ccc;
+  }
+  li { margin-bottom: 6px; }
+  li strong { color: #eee; }
+
+  /* ── Code & pre ───────────────────────────────────────── */
+  code {
+    background: var(--tag-bg);
+    color: #7ec8f0;
+    font-family: "SF Mono", "Fira Code", Menlo, monospace;
+    font-size: 12.5px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #1e3048;
+  }
+
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    margin: 16px 0 20px;
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    color: #a8cc8c;
+    font-size: 13px;
+  }
+
+  /* ── Tables ───────────────────────────────────────────── */
+  .table-wrap { overflow-x: auto; margin: 16px 0 24px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13.5px;
+  }
+
+  th {
+    background: var(--panel);
+    color: #fff;
+    font-weight: 600;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 9px 14px;
+    border-bottom: 1px solid var(--border);
+    color: #ccc;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+
+  td code, th code { font-size: 12px; }
+
+  /* ── Key badges ───────────────────────────────────────── */
+  .key {
+    display: inline-block;
+    background: var(--panel);
+    border: 1px solid #444;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: "SF Mono", Menlo, monospace;
+    font-size: 11.5px;
+    color: #ddd;
+    white-space: nowrap;
+  }
+
+  /* ── Callouts ─────────────────────────────────────────── */
+  .tip {
+    background: rgba(74,158,255,0.08);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 6px 6px 0;
+    padding: 12px 16px;
+    margin: 16px 0;
+    font-size: 13.5px;
+    color: #b8d4f0;
+  }
+  .tip strong { color: var(--accent); }
+
+  /* ── Node type cards ──────────────────────────────────── */
+  .node-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 16px 0 24px;
+  }
+  .node-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .node-badge {
+    background: var(--accent2);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    width: 30px; height: 30px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    font-family: "SF Mono", Menlo, monospace;
+  }
+  .node-card-title { font-size: 16px; font-weight: 600; color: #fff; }
+  .node-card p { margin-bottom: 8px; font-size: 13.5px; }
+  .node-card ul { margin-bottom: 0; }
+  .node-card li { font-size: 13.5px; }
+
+  /* ── Step list ────────────────────────────────────────── */
+  .steps { counter-reset: step; list-style: none; padding: 0; margin: 0 0 16px; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 10px;
+    align-items: flex-start;
+  }
+  .steps li::before {
+    content: counter(step);
+    background: var(--accent2);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+
+  /* ── Hero ─────────────────────────────────────────────── */
+  #hero {
+    margin-bottom: 56px;
+    padding-bottom: 40px;
+    border-bottom: 1px solid var(--border);
+  }
+  #hero .subtitle {
+    font-size: 16px;
+    color: var(--muted);
+    margin-bottom: 24px;
+  }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; }
+  .badge {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: #aaa;
+  }
+
+  /* ── Footer ───────────────────────────────────────────── */
+  #footer {
+    margin-top: 80px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    font-size: 12px;
+    color: var(--muted);
+    text-align: center;
+  }
+
+  /* ── Shortcut grid ────────────────────────────────────── */
+  .shortcut-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+    margin: 12px 0 24px;
+  }
+  .shortcut-item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .shortcut-item .sk { font-size: 12px; }
+  .shortcut-item .sd { font-size: 12px; color: var(--muted); }
+
+  /* ── Tips grid ────────────────────────────────────────── */
+  .tips-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+  .tip-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 18px;
+  }
+  .tip-card h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: #ddd;
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 0 0 6px;
+  }
+  .tip-card p { font-size: 13px; margin: 0; color: #999; }
+
+  /* ── Scrollbar for content ────────────────────────────── */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
+<nav id="sidebar">
+  <div id="sidebar-header">
+    <img src="../logo/theFlow_white.svg" alt="theFlow!" style="height:36px; display:block; margin-bottom:4px;">
+    <p>User Manual · v0.1.0</p>
+  </div>
+  <div id="sidebar-search">
+    <input id="search-input" type="text" placeholder="Search…" oninput="filterNav(this.value)">
+  </div>
+  <div id="nav">
+    <div class="nav-group" id="grp-overview">
+      <div class="nav-group-header" onclick="toggleGroup('grp-overview')">
+        Overview <span class="nav-group-arrow">▾</span>
+      </div>
+      <div class="nav-group-items">
+        <a href="#intro" data-section="intro">Introduction</a>
+        <a href="#start" data-section="start">Getting Started</a>
+        <a href="#canvas" data-section="canvas">The Canvas</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="grp-elements">
+      <div class="nav-group-header" onclick="toggleGroup('grp-elements')">
+        Elements <span class="nav-group-arrow">▾</span>
+      </div>
+      <div class="nav-group-items">
+        <a href="#nodes" data-section="nodes">Nodes</a>
+        <a href="#node-text" class="sub" data-section="node-text">Text Node</a>
+        <a href="#node-image" class="sub" data-section="node-image">Image Node</a>
+        <a href="#node-movie" class="sub" data-section="node-movie">Movie Node</a>
+        <a href="#node-audio" class="sub" data-section="node-audio">Audio Node</a>
+        <a href="#node-doc" class="sub" data-section="node-doc">Document Node</a>
+        <a href="#node-paint" class="sub" data-section="node-paint">Paint Node</a>
+        <a href="#dots" data-section="dots">Dots</a>
+        <a href="#connections" data-section="connections">Connections</a>
+        <a href="#backdrops" data-section="backdrops">Backdrops</a>
+        <a href="#stickies" data-section="stickies">Sticky Notes</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="grp-working">
+      <div class="nav-group-header" onclick="toggleGroup('grp-working')">
+        Working <span class="nav-group-arrow">▾</span>
+      </div>
+      <div class="nav-group-items">
+        <a href="#organise" data-section="organise">Organising</a>
+        <a href="#files" data-section="files">Files</a>
+        <a href="#draw" data-section="draw">Draw Annotations</a>
+        <a href="#settings" data-section="settings">Settings</a>
+      </div>
+    </div>
+
+    <div class="nav-group" id="grp-reference">
+      <div class="nav-group-header" onclick="toggleGroup('grp-reference')">
+        Reference <span class="nav-group-arrow">▾</span>
+      </div>
+      <div class="nav-group-items">
+        <a href="#shortcuts" data-section="shortcuts">Shortcuts</a>
+        <a href="#tips" data-section="tips">Tips &amp; Tricks</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════ CONTENT -->
+<main id="content">
+
+  <!-- Hero -->
+  <div id="hero">
+    <img src="../logo/theFlow_white.svg" alt="theFlow!" style="height:52px; display:block; margin-bottom:12px;">
+    <p class="subtitle">A visual canvas for connecting ideas, media, and workflows.</p>
+    <div class="badges">
+      <span class="badge">Version 0.1.0</span>
+      <span class="badge">Xavier Garès</span>
+      <span class="badge">© 2026</span>
+      <span class="badge">GPLv3</span>
+    </div>
+  </div>
+
+  <!-- ── 1. Introduction ───────────────────────────────── -->
+  <div class="section" id="intro">
+    <h2>Introduction</h2>
+
+    <h3>What is theFlow!?</h3>
+    <p>theFlow! is a beautiful, lightweight, infinite canvas application designed for visual thinking and knowledge organization.</p>
+    <p>Think of it as a whiteboard where you can place different kinds of <strong>nodes</strong> — containers that hold text, images, video, audio, documents, or drawings — and draw <strong>connections</strong> between them to map out ideas, workflows, stories, or any structure that matters to you.</p>
+    <p>Unlike a traditional document or presentation, theFlow! has no fixed order. You arrange things spatially, the way your mind actually works.</p>
+
+    <h3>Who is theFlow! for?</h3>
+    <ul>
+      <li>Mind mappers and visual thinkers</li>
+      <li>Project planners and product managers</li>
+      <li>Developers and system architects</li>
+      <li>Researchers and knowledge workers</li>
+      <li>Students and educators</li>
+      <li>Writers and content creators</li>
+      <li>Anyone who thinks better spatially than linearly</li>
+    </ul>
+
+    <h3>What can you do with it?</h3>
+    <ul>
+      <li>Map out a project with connected ideas</li>
+      <li>Build a visual storyboard with images and video</li>
+      <li>Annotate a workflow with sticky notes and backdrops</li>
+      <li>Link audio, video, and documents into a single visual overview</li>
+      <li>Sketch directly on a paint node</li>
+      <li>Share a <code>.flow</code> file with collaborators</li>
+    </ul>
+
+    <h3>Key Concepts</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Term</th><th>What it means</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Canvas</strong></td><td>The infinite workspace you draw on</td></tr>
+          <tr><td><strong>Node</strong></td><td>A container holding content (text, image, video, etc.)</td></tr>
+          <tr><td><strong>Connection</strong></td><td>A line drawn between two nodes</td></tr>
+          <tr><td><strong>Socket</strong></td><td>The small circle on the edge of a node where connections attach</td></tr>
+          <tr><td><strong>Dot</strong></td><td>A small junction point on a connection line</td></tr>
+          <tr><td><strong>Backdrop</strong></td><td>A coloured region that groups nodes visually</td></tr>
+          <tr><td><strong>Sticky Note</strong></td><td>A freeform text note, like a Post-it</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 2. Getting Started ─────────────────────────────── -->
+  <div class="section" id="start">
+    <h2>Getting Started</h2>
+
+    <h3>Your First Node</h3>
+    <ol class="steps">
+      <li>Right-click anywhere on the empty canvas.</li>
+      <li>Go to <strong>Create → Node → Text Node</strong>, or simply press <span class="key">T</span>.</li>
+      <li>A text node appears at the cursor position.</li>
+      <li><strong>Double-click</strong> the node to open the editor and give it a name and body text.</li>
+      <li>Click <strong>OK</strong> to close.</li>
+    </ol>
+
+    <h3>Your First Connection</h3>
+    <ol class="steps">
+      <li>Create a second node (press <span class="key">T</span> again somewhere else).</li>
+      <li>Hover over the first node — a small coloured <strong>socket</strong> appears on its edge.</li>
+      <li>Click and drag from that socket toward the second node.</li>
+      <li>Release over the second node's socket.</li>
+      <li>A connection line appears between them.</li>
+    </ol>
+  </div>
+
+  <!-- ── 3. The Canvas ──────────────────────────────────── -->
+  <div class="section" id="canvas">
+    <h2>The Canvas</h2>
+
+    <h3>Navigating</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pan</strong></td><td>Hold middle mouse button and drag, or hold <span class="key">Space</span> and drag</td></tr>
+          <tr><td><strong>Zoom in</strong></td><td>Scroll up, or <span class="key">Ctrl +</span></td></tr>
+          <tr><td><strong>Zoom out</strong></td><td>Scroll down, or <span class="key">Ctrl −</span></td></tr>
+          <tr><td><strong>Frame selected</strong></td><td>Press <span class="key">F</span> with items selected</td></tr>
+          <tr><td><strong>Frame all</strong></td><td>Press <span class="key">F</span> with nothing selected</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Selecting Items</h3>
+    <ul>
+      <li><strong>Click</strong> a node, connection, dot, backdrop, or sticky note to select it.</li>
+      <li><strong>Click and drag</strong> on empty canvas to rubber-band select multiple items.</li>
+      <li><strong>Click</strong> on empty canvas to deselect everything.</li>
+    </ul>
+
+    <h3>The Right-Click Menu</h3>
+    <p>Right-clicking on the <strong>canvas</strong> opens the main menu:</p>
+    <pre><code>File   ▸  New File / Open / Save / Save As / Export Selected / Import Nodes / Quit
+Edit   ▸  Copy / Cut / Paste / Undo / Redo
+Create ▸  Node ▸ … / Dot / Backdrop / Sticky Note
+View   ▸  Rearrange / Frame / Expand viewers …
+Draw   ▸  Draw Annotation
+Settings
+Help   ▸  Shortcuts / Documentation
+About</code></pre>
+Edit   ▸  Copy / Cut / Paste / Undo / Redo
+Create ▸  Node ▸ … / Dot / Backdrop / Sticky Note
+View   ▸  Rearrange / Frame / Expand viewers …
+Settings
+Help   ▸  Shortcuts / Documentation
+About</code></pre>
+    <p>Right-clicking on a <strong>node</strong>, <strong>dot</strong>, <strong>backdrop</strong>, or <strong>sticky note</strong> opens that item's own context menu instead.</p>
+
+    <h3>The Tab Quick-Create Menu</h3>
+    <p>Press <span class="key">Tab</span> anywhere on the canvas to open a pop-up list of everything you can create. Click an item to place it at the cursor position. This is the fastest way to create nodes without using the right-click menu.</p>
+  </div>
+
+  <!-- ── 4. Nodes ───────────────────────────────────────── -->
+  <div class="section" id="nodes">
+    <h2>Nodes</h2>
+    <p>A node is the basic building block of theFlow!. Every node has:</p>
+    <ul>
+      <li>A <strong>name</strong> displayed on its body</li>
+      <li>An <strong>input socket</strong> (left side by default) where connections arrive</li>
+      <li>An <strong>output socket</strong> (right side by default) where connections leave</li>
+      <li>A <strong>type icon</strong> that shows what kind of content it holds</li>
+    </ul>
+
+    <h3 id="node-text">Text Node — <span class="key">T</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">T</div>
+        <div class="node-card-title">Text Node</div>
+      </div>
+      <p>Holds a name (shown on the canvas) and body text (hidden until you open the inline viewer). Use it for ideas, descriptions, or any plain content.</p>
+      <p><strong>Double-click</strong> to open the editor:</p>
+      <ul>
+        <li><strong>Name</strong> — shown on the node at all times</li>
+        <li><strong>Text</strong> — body content, supports bold, italic, underline, strikethrough</li>
+        <li><strong>Canvas font size</strong> — controls how large the name appears</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected text node with body content to open the <strong>inline text viewer</strong> — a resizable panel below the node. Drag its bottom-right corner to resize.</p>
+    </div>
+
+    <h3 id="node-image">Image Node — <span class="key">I</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">I</div>
+        <div class="node-card-title">Image Node</div>
+      </div>
+      <p>Holds a reference to an image file on disk.</p>
+      <p><strong>Double-click</strong> to open the editor:</p>
+      <ul>
+        <li>Set or change the <strong>name</strong></li>
+        <li><strong>Browse</strong> to load an image file (PNG, JPG, SVG, TIFF, and more)</li>
+        <li>Preview the image with scroll-to-zoom and drag-to-pan</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected image node to show the <strong>inline image viewer</strong> below the node.</p>
+    </div>
+
+    <h3 id="node-movie">Movie Node — <span class="key">M</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">M</div>
+        <div class="node-card-title">Movie Node</div>
+      </div>
+      <p>Holds a reference to a video file on disk.</p>
+      <p><strong>Double-click</strong> to open the editor:</p>
+      <ul>
+        <li>Set or change the <strong>name</strong></li>
+        <li><strong>Browse</strong> to load a video file (MP4, MOV, AVI, MKV, and more)</li>
+        <li>Play, pause, stop and scrub through the video directly in the dialog</li>
+        <li>Adjust volume with the slider</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected movie node to open the <strong>inline video player</strong> below the node — a full player with timeline, transport controls, and volume, that scales with canvas zoom.</p>
+    </div>
+
+    <h3 id="node-audio">Audio Node — <span class="key">A</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">A</div>
+        <div class="node-card-title">Audio Node</div>
+      </div>
+      <p>Holds a reference to an audio file on disk.</p>
+      <p><strong>Double-click</strong> to open the editor:</p>
+      <ul>
+        <li>Set or change the <strong>name</strong></li>
+        <li><strong>Browse</strong> to load an audio file (WAV, MP3, AAC, FLAC, and more)</li>
+        <li>A waveform preview is shown (real peaks for WAV, simulated for other formats)</li>
+        <li>Play, pause, stop, scrub, and adjust volume</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected audio node to open the <strong>inline audio player</strong>. Hover over it to reveal transport controls and timeline. Only one player plays at a time — starting one pauses all others.</p>
+    </div>
+
+    <h3 id="node-doc">Document Node — <span class="key">D</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">D</div>
+        <div class="node-card-title">Document Node</div>
+      </div>
+      <p>Holds a reference to any file — PDFs, text files, code, spreadsheets, or anything else.</p>
+      <p><strong>Double-click</strong> to open the editor:</p>
+      <ul>
+        <li>Set or change the <strong>name</strong></li>
+        <li><strong>Browse</strong> to load any file</li>
+        <li>A preview is shown for images, text files, and PDFs</li>
+        <li>Click <strong>Open with System Application</strong> to open in its default app</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected document node to open the <strong>inline doc viewer</strong>, which shows the file name and an Open button.</p>
+    </div>
+
+    <h3 id="node-paint">Paint Node — <span class="key">P</span></h3>
+    <div class="node-card">
+      <div class="node-card-header">
+        <div class="node-badge">P</div>
+        <div class="node-card-title">Paint Node</div>
+      </div>
+      <p>An in-app freehand drawing canvas.</p>
+      <p><strong>Double-click</strong> to open the <strong>paint editor</strong>:</p>
+      <ul>
+        <li><strong>Color</strong> — pick the brush colour</li>
+        <li><strong>BG</strong> — pick the canvas background colour</li>
+        <li><strong>Size</strong> — adjust brush size with the slider</li>
+        <li><strong>Radius</strong> — controls stroke taper (0 = flat ends, higher = rounder, tapered strokes)</li>
+        <li><strong>Eraser</strong> — toggle eraser mode</li>
+        <li>Scroll to zoom, <span class="key">Space</span> + drag or middle-mouse to pan the drawing canvas</li>
+        <li>Click <strong>Done</strong> or close the window to save the drawing back to the node</li>
+      </ul>
+      <p>Press <span class="key">↓</span> on a selected paint node to show the drawing as an <strong>inline image</strong> below the node.</p>
+    </div>
+
+    <h3>Creating Nodes</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Method</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td>Keyboard shortcut</td><td>Press the letter key anywhere on the canvas</td></tr>
+          <tr><td>Tab menu</td><td>Press <span class="key">Tab</span>, then click the type</td></tr>
+          <tr><td>Right-click menu</td><td>Right-click → Create → Node → …</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Moving, Copying, Deleting</h3>
+    <ul>
+      <li><strong>Move</strong> — click and drag any node</li>
+      <li><strong>Copy</strong> — <span class="key">Ctrl C</span> / <strong>Cut</strong> — <span class="key">Ctrl X</span> / <strong>Paste</strong> — <span class="key">Ctrl V</span></li>
+      <li><strong>Delete</strong> — select and press <span class="key">Del</span> or <span class="key">Bksp</span>. If the deleted node had exactly one connection in and one out, they merge automatically.</li>
+    </ul>
+
+    <h3>Editing Appearance</h3>
+    <p>Right-click any node to access:</p>
+    <ul>
+      <li><strong>Edit Orientation</strong> — move sockets to a different edge (Left→Right, Top→Bottom, Right→Left, Bottom→Top)</li>
+      <li><strong>Edit Shape</strong> — Square, Circle, Diamond, Triangle, Ellipse, or Hexagon</li>
+      <li><strong>Edit Node Color</strong> — pick a custom fill colour</li>
+      <li><strong>Edit Font Size</strong> — set the name label size</li>
+      <li><strong>Edit Font Color</strong> — pick a custom name colour</li>
+    </ul>
+
+    <h3>Inline Viewers</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><span class="key">↓</span></td><td>Open inline viewer/player for selected node(s)</td></tr>
+          <tr><td><span class="key">↑</span></td><td>Close inline viewer/player for selected node(s)</td></tr>
+          <tr><td><span class="key">Shift ↓</span></td><td>Expand all inline viewers on the canvas</td></tr>
+          <tr><td><span class="key">Shift ↑</span></td><td>Close all inline viewers on the canvas</td></tr>
+          <tr><td><span class="key">Space</span></td><td>Play/pause the inline player under the cursor</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 5. Dots ─────────────────────────────────────────── -->
+  <div class="section" id="dots">
+    <h2>Dots</h2>
+    <p>A <strong>Dot</strong> is a small circular junction point that lives on a connection line. It acts as a pass-through — connections flow in through one socket and out through the other.</p>
+
+    <h3>Creating a Dot</h3>
+    <ul>
+      <li>Press <span class="key">Q</span> to place a dot at the cursor position, then connect it manually.</li>
+      <li><span class="key">Shift</span>-click on an existing connection line to split it — a dot is inserted automatically and the line becomes two.</li>
+    </ul>
+
+    <h3>Using Dots</h3>
+    <p>Dots let you route connections through intermediate points, creating branching or complex layouts. You can drag a dot anywhere on the canvas to reshape the path.</p>
+
+    <h3>Removing a Dot</h3>
+    <p><span class="key">Shift</span>-click a dot that has exactly one connection in and one out — the dot is removed and the two lines merge back into one.</p>
+
+    <h3>Dot Appearance</h3>
+    <p>Right-click a dot to access:</p>
+    <ul>
+      <li><strong>Edit Orientation</strong> — change which sides the sockets are on</li>
+      <li><strong>Edit Dot Color</strong> — pick a custom colour</li>
+    </ul>
+  </div>
+
+  <!-- ── 6. Connections ─────────────────────────────────── -->
+  <div class="section" id="connections">
+    <h2>Connections</h2>
+    <p>A connection is a line drawn between two node sockets or between a socket and a dot.</p>
+
+    <h3>Drawing a Connection</h3>
+    <ol class="steps">
+      <li>Hover over a node until the socket circle appears.</li>
+      <li>Click and drag from the socket.</li>
+      <li>A temporary line follows your cursor.</li>
+      <li>Release over another node's socket or a dot socket.</li>
+    </ol>
+    <p>You can connect output → input, input → output, or any socket → any socket. theFlow! normalises the direction automatically.</p>
+
+    <h3>Connection Types</h3>
+    <p>Right-click a connection line to change its type:</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Type</th><th>Appearance</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Bezier</strong></td><td>Smooth curved line (default)</td></tr>
+          <tr><td><strong>Line</strong></td><td>Straight line between sockets</td></tr>
+          <tr><td><strong>Step</strong></td><td>Right-angled stepped path</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Customising a Connection</h3>
+    <p>Right-click a connection to access:</p>
+    <ul>
+      <li><strong>Change Line Style</strong> — Solid, Dashed, or Dotted</li>
+      <li><strong>Change Line Color</strong> — pick a custom colour</li>
+      <li><strong>Change Line Width</strong> — set thickness in pixels</li>
+    </ul>
+    <div class="tip">Custom colour, style, and width are preserved when you switch themes. Connection type is always preserved.</div>
+
+    <h3>Disconnecting</h3>
+    <ul>
+      <li>Select a connection and press <span class="key">Del</span> or <span class="key">Bksp</span> to remove it.</li>
+      <li><span class="key">Shift</span>-click a node to disconnect all its connections at once. If it has exactly one in and one out, they merge automatically.</li>
+    </ul>
+  </div>
+
+  <!-- ── 7. Backdrops ───────────────────────────────────── -->
+  <div class="section" id="backdrops">
+    <h2>Backdrops</h2>
+    <p>A <strong>Backdrop</strong> is a large coloured region used to visually group nodes. When you move a backdrop, all nodes fully inside it move with it.</p>
+
+    <h3>Creating a Backdrop</h3>
+    <ul>
+      <li>Press <span class="key">B</span> to create a blank backdrop at the cursor.</li>
+      <li><strong>Or</strong> — select a group of nodes first, then press <span class="key">B</span>. theFlow! creates a backdrop that exactly fits around the selection, with extra padding for the title.</li>
+    </ul>
+
+    <h3>Resizing</h3>
+    <p>Drag any of the four corner handles. Nodes pinned inside stay in place relative to the backdrop during the resize.</p>
+
+    <h3>Editing a Backdrop</h3>
+    <p><strong>Double-click</strong> to open the editor:</p>
+    <ul>
+      <li><strong>Name</strong> — the large title shown at the top-left</li>
+      <li><strong>Text</strong> — optional body text shown below the title</li>
+      <li><strong>Canvas font size</strong> — controls the title size</li>
+    </ul>
+    <p>Right-click to access:</p>
+    <ul>
+      <li><strong>Edit Backdrop Color</strong> — pick the fill tint</li>
+      <li><strong>Edit Font Size</strong> — change the title size</li>
+      <li><strong>Edit Font Color</strong> — change the text colour</li>
+    </ul>
+
+    <h3>Nesting Backdrops</h3>
+    <p>You can place a backdrop inside another backdrop. The inner one moves with the outer one.</p>
+  </div>
+
+  <!-- ── 8. Sticky Notes ────────────────────────────────── -->
+  <div class="section" id="stickies">
+    <h2>Sticky Notes</h2>
+    <p>A <strong>Sticky Note</strong> is a simple coloured note — like a Post-it — for quick annotations anywhere on the canvas.</p>
+
+    <h3>Creating a Sticky Note</h3>
+    <p>Press <span class="key">S</span>, or use the Tab menu / right-click menu.</p>
+
+    <h3>Editing</h3>
+    <p><strong>Double-click</strong> to open the editor:</p>
+    <ul>
+      <li><strong>Name</strong> — shown bold at the top of the note</li>
+      <li><strong>Text</strong> — body content, word-wrapped</li>
+      <li><strong>Canvas font size</strong> — controls text size</li>
+    </ul>
+
+    <h3>Resizing</h3>
+    <p>Drag any of the four corner handles.</p>
+
+    <h3>Appearance</h3>
+    <p>Right-click to access:</p>
+    <ul>
+      <li><strong>Edit Note Color</strong> — pick the background colour</li>
+      <li><strong>Edit Font Size</strong> — change text size</li>
+      <li><strong>Edit Font Color</strong> — change text colour</li>
+    </ul>
+  </div>
+
+  <!-- ── 9. Organising ──────────────────────────────────── -->
+  <div class="section" id="organise">
+    <h2>Organising Your Canvas</h2>
+
+    <h3>Rearranging Nodes</h3>
+    <p>Select two or more nodes, then right-click the canvas:</p>
+    <ul>
+      <li><strong>Rearrange Horizontally</strong> — lines nodes up left to right, spaced by their actual width with a gap between each</li>
+      <li><strong>Rearrange Vertically</strong> — lines nodes up top to bottom, spaced by their actual height with a gap between each</li>
+    </ul>
+    <p>Both commands respect the node's shape — a circle or diamond will be spaced correctly, never overlapping.</p>
+
+    <h3>Framing the View</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>How</th></tr></thead>
+        <tbody>
+          <tr><td>Frame selected items</td><td>Select items, press <span class="key">F</span></td></tr>
+          <tr><td>Frame everything</td><td>Press <span class="key">F</span> with nothing selected</td></tr>
+          <tr><td>Center selected</td><td>Right-click → View → Center Selected</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Inline Viewers</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Shortcut</th></tr></thead>
+        <tbody>
+          <tr><td>Open viewer for selected node(s)</td><td><span class="key">↓</span></td></tr>
+          <tr><td>Close viewer for selected node(s)</td><td><span class="key">↑</span></td></tr>
+          <tr><td>Open all viewers on canvas</td><td><span class="key">Shift ↓</span></td></tr>
+          <tr><td>Close all viewers on canvas</td><td><span class="key">Shift ↑</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ── 10. Files ──────────────────────────────────────── -->
+  <div class="section" id="files">
+    <h2>Files</h2>
+
+    <h3>File Format</h3>
+    <p>theFlow! saves your canvas as a <code>.flow</code> file — a JSON text file containing all nodes, connections, positions, colours, and embedded paint drawings. It can be reopened on any machine running theFlow!.</p>
+
+    <h3>File Operations</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Shortcut</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><strong>New File</strong></td><td><span class="key">Ctrl N</span></td><td>Clears the canvas. Prompts to save if there are unsaved changes.</td></tr>
+          <tr><td><strong>Open</strong></td><td><span class="key">Ctrl O</span></td><td>Opens a <code>.flow</code> file from disk.</td></tr>
+          <tr><td><strong>Save</strong></td><td><span class="key">Ctrl S</span></td><td>Saves to the current file. Prompts for location if file is unnamed.</td></tr>
+          <tr><td><strong>Save As</strong></td><td><span class="key">Ctrl Shift S</span></td><td>Saves to a new location.</td></tr>
+          <tr><td><strong>Export Selected</strong></td><td><span class="key">Ctrl E</span></td><td>Saves only the selected nodes, backdrops, sticky notes, and their connections to a new <code>.flow</code> file. Shows a warning if nothing is selected. Annotation strokes overlapping the selection are included.</td></tr>
+          <tr><td><strong>Import Nodes</strong></td><td><span class="key">Ctrl I</span></td><td>Loads nodes from a <code>.flow</code> file and adds them to the current canvas without clearing it. Imported items are offset by 80 px so they do not overlap existing content.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Autosave</h3>
+    <p>When <strong>Autosave</strong> is enabled in Settings, theFlow! automatically saves your file every 30 seconds — but only if:</p>
+    <ul>
+      <li>The file has already been saved at least once (has a name and location)</li>
+      <li>There are unsaved changes</li>
+    </ul>
+    <div class="tip"><strong>Tip:</strong> Autosave never creates new files or overwrites an unnamed canvas. Toggle it in <strong>Settings → Canvas → Autosave</strong>.</div>
+  </div>
+
+  <!-- ── 11. Settings ───────────────────────────────────── -->
+
+  <!-- ── Draw Annotations ───────────────────────────────── -->
+  <div class="section" id="draw">
+    <h2>Draw Annotations</h2>
+    <p>Annotation mode lets you draw freehand strokes directly on the canvas — on top of all nodes, backdrops, and connections. Strokes are saved with the file and included in exports.</p>
+
+    <h3>Activating</h3>
+    <p>Press <span class="key">Ctrl P</span> or go to <strong>Draw ▸ Draw Annotation</strong> in the right-click menu. A floating toolbar appears at the top-left of the canvas. Press <span class="key">Ctrl P</span> again or click <strong>Close</strong> to exit.</p>
+
+    <h3>Toolbar Controls</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Control</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Draw button</strong></td><td>Switch to draw mode. Click and drag to paint a stroke.</td></tr>
+          <tr><td><strong>Erase button</strong></td><td>Switch to erase mode. Click and drag to remove strokes whose path the cursor crosses.</td></tr>
+          <tr><td><strong>Colour swatch</strong></td><td>Opens a colour picker to set the stroke colour.</td></tr>
+          <tr><td><strong>Thickness slider</strong></td><td>Sets the stroke width (1–40).</td></tr>
+          <tr><td><strong>Style dropdown</strong></td><td>Choose between solid (——), dashed (- -), or dotted (···) strokes.</td></tr>
+          <tr><td><strong>Clear</strong></td><td>Removes all annotation strokes from the canvas (undoable).</td></tr>
+          <tr><td><strong>Close</strong></td><td>Exits annotation mode. Strokes remain on the canvas.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Defaults</h3>
+    <p>The default colour, thickness, and style for new strokes are set in <strong>Settings → Annotations</strong>. Changes take effect immediately — including while the toolbar is open.</p>
+
+    <div class="tip"><strong>Tip:</strong> Strokes are fully undoable with <span class="key">Ctrl Z</span>. You can also select individual strokes and delete them with <span class="key">Del</span>.</div>
+  </div>
+  <div class="section" id="settings">
+    <h2>Settings</h2>
+    <p>Open Settings by right-clicking the canvas and choosing <strong>Settings</strong>.</p>
+
+    <h3>Themes</h3>
+    <p>The <strong>Dark Theme</strong> and <strong>Light Theme</strong> buttons instantly switch the entire application colour scheme — canvas background, menus, and all default node colours.</p>
+    <div class="tip">Nodes, dots, backdrops, sticky notes, and connections that you have individually coloured using their context menu <strong>keep their custom colour</strong> when you switch themes.</div>
+
+    <h3>Canvas Tab</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Canvas Background</td><td>The colour of the infinite canvas</td></tr>
+          <tr><td>Context Menu Background</td><td>The background of right-click menus</td></tr>
+          <tr><td>Autosave</td><td>Toggle automatic saving every 30 seconds</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Nodes Tab</h3>
+    <p>For each node type (Text, Image, Movie, Audio, Document, Paint, Dot) you can set default values that apply to <strong>newly created</strong> nodes:</p>
+    <ul>
+      <li>Node / Dot Color</li>
+      <li>Font Size and Font Color</li>
+      <li>Socket Orientation</li>
+      <li>Shape (not available for Dot)</li>
+    </ul>
+    <p>Use <strong>Reset Section Defaults</strong> to restore a single node type to its theme defaults.</p>
+
+    <h3>Curves Tab</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Connection Line Color</td><td>Default line colour for new connections</td></tr>
+          <tr><td>Line Thickness</td><td>Default line width</td></tr>
+          <tr><td>Line Style</td><td>Solid, Dash, or Dot</td></tr>
+          <tr><td>Routing Type</td><td>Bezier, Straight, or Step</td></tr>
+          <tr><td>Socket Color</td><td>Colour of the socket circles</td></tr>
+          <tr><td>Socket Size</td><td>Size of the socket circles</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Sticky Notes &amp; Backdrops Tabs</h3>
+    <p>Set the default colour, font size, and font colour for newly created sticky notes and backdrops respectively.</p>
+
+
+    <h3>Annotations Tab</h3>
+    <p>Sets the default stroke colour, thickness, and style used when entering annotation mode. Changes apply immediately to the active painter — even while the toolbar is open.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Setting</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td>Stroke Color</td><td>Default colour for new annotation strokes</td></tr>
+          <tr><td>Stroke Thickness</td><td>Default width (1–40)</td></tr>
+          <tr><td>Stroke Style</td><td>Default pattern: solid, dashed, or dotted</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Saving Settings</h3>
+    <p>Click <strong>Save Settings</strong> to write your settings to disk. Settings are stored in <code>settings/settings.json</code> inside the application folder and are loaded automatically at startup.</p>
+  </div>
+
+  <!-- ── 12. Shortcuts ──────────────────────────────────── -->
+  <div class="section" id="shortcuts">
+    <h2>Keyboard Shortcuts Reference</h2>
+
+    <h3>Creating</h3>
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="key sk">T</span><span class="sd">Text Node</span></div>
+      <div class="shortcut-item"><span class="key sk">I</span><span class="sd">Image Node</span></div>
+      <div class="shortcut-item"><span class="key sk">M</span><span class="sd">Movie Node</span></div>
+      <div class="shortcut-item"><span class="key sk">A</span><span class="sd">Audio Node</span></div>
+      <div class="shortcut-item"><span class="key sk">D</span><span class="sd">Document Node</span></div>
+      <div class="shortcut-item"><span class="key sk">P</span><span class="sd">Paint Node</span></div>
+      <div class="shortcut-item"><span class="key sk">Q</span><span class="sd">Dot</span></div>
+      <div class="shortcut-item"><span class="key sk">B</span><span class="sd">Backdrop</span></div>
+      <div class="shortcut-item"><span class="key sk">S</span><span class="sd">Sticky Note</span></div>
+      <div class="shortcut-item"><span class="key sk">Tab</span><span class="sd">Quick-create menu</span></div>
+    </div>
+
+    <h3>Editing</h3>
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="key sk">Ctrl Z</span><span class="sd">Undo</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl Y</span><span class="sd">Redo</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl C</span><span class="sd">Copy</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl X</span><span class="sd">Cut</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl V</span><span class="sd">Paste</span></div>
+      <div class="shortcut-item"><span class="key sk">Del / Bksp</span><span class="sd">Delete selected</span></div>
+    </div>
+
+    <h3>Connections</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Action</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><span class="key">Shift</span>-click a connection</td><td>Insert a dot / split the line</td></tr>
+          <tr><td><span class="key">Shift</span>-click a dot</td><td>Remove dot / merge lines</td></tr>
+          <tr><td><span class="key">Shift</span>-click a node</td><td>Disconnect all connections</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>View</h3>
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="key sk">F</span><span class="sd">Frame selected / all</span></div>
+      <div class="shortcut-item"><span class="key sk">↓</span><span class="sd">Open inline viewer</span></div>
+      <div class="shortcut-item"><span class="key sk">↑</span><span class="sd">Close inline viewer</span></div>
+      <div class="shortcut-item"><span class="key sk">Shift ↓</span><span class="sd">Expand all viewers</span></div>
+      <div class="shortcut-item"><span class="key sk">Shift ↑</span><span class="sd">Close all viewers</span></div>
+      <div class="shortcut-item"><span class="key sk">Space</span><span class="sd">Play / pause player</span></div>
+      <div class="shortcut-item"><span class="key sk">Middle drag</span><span class="sd">Pan</span></div>
+      <div class="shortcut-item"><span class="key sk">Scroll</span><span class="sd">Zoom</span></div>
+    </div>
+
+    <h3>File</h3>
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="key sk">Ctrl N</span><span class="sd">New file</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl O</span><span class="sd">Open</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl S</span><span class="sd">Save</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl Shift S</span><span class="sd">Save As</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl E</span><span class="sd">Export Selected</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl I</span><span class="sd">Import Nodes</span></div>
+      <div class="shortcut-item"><span class="key sk">Ctrl Q</span><span class="sd">Quit</span></div>
+      <div class="shortcut-item"><span class="key sk">K</span><span class="sd">Show shortcuts</span></div>
+    </div>
+
+    <h3>Draw Annotations</h3>
+    <div class="shortcut-grid">
+      <div class="shortcut-item"><span class="key sk">Ctrl P</span><span class="sd">Toggle annotation mode</span></div>
+    </div>
+  </div>
+
+  <!-- ── 13. Tips ───────────────────────────────────────── -->
+  <div class="section" id="tips">
+    <h2>Tips &amp; Tricks</h2>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <h4>Start with a backdrop</h4>
+        <p>Press <code>B</code> before placing nodes to create a labelled region. This keeps large canvases organised from the start.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Tab is fastest</h4>
+        <p>Move the cursor to where you want the node, press <code>Tab</code>, click the type. Faster than any menu.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Double-click is always edit</h4>
+        <p>On any item — node, sticky note, backdrop — double-clicking always opens its editor.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Shift-click to split</h4>
+        <p>Want a waypoint on a connection? <code>Shift</code>-click the line at exactly the point you want the bend.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Frame after pasting</h4>
+        <p>After pasting a complex set of nodes, press <code>F</code> to frame everything and get a quick overview.</p>
+      </div>
+      <div class="tip-card">
+        <h4>One player at a time</h4>
+        <p>Starting any inline audio or video player automatically pauses all others. The last one you click has priority.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Paint saves on close</h4>
+        <p>You don't need to click Done. Closing the paint window also saves the drawing back to the node.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Custom colours survive themes</h4>
+        <p>Colours you pick via the context menu colour picker are remembered and never overwritten by theme switches.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Enable autosave</h4>
+        <p>Settings → Canvas → Autosave. Saves silently every 30 seconds once your file has a name.</p>
+      </div>
+      <div class="tip-card">
+        <h4>Text viewer is resizable</h4>
+        <p>After opening the inline text viewer with <code>↓</code>, drag the bottom-right corner to any size you need.</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer">
+    theFlow! &nbsp;·&nbsp; Version 0.1.0 &nbsp;·&nbsp; © 2026 Xavier Garès &nbsp;·&nbsp; GPLv3
+  </div>
+
+</main>
+
+<script>
+  // ── Toggle collapsible nav groups ────────────────────────
+  function toggleGroup(id) {
+    document.getElementById(id).classList.toggle('collapsed');
+  }
+
+  // ── Active nav highlight on scroll ──────────────────────
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('#nav a[data-section]');
+
+  function getActive() {
+    let best = null;
+    for (const s of sections) {
+      const top = s.getBoundingClientRect().top;
+      if (top <= 80) best = s.id;
+    }
+    return best;
+  }
+
+  function updateNav() {
+    const active = getActive();
+    navLinks.forEach(a => {
+      const isActive = a.dataset.section === active;
+      a.classList.toggle('active', isActive);
+      // Auto-expand the group containing the active link
+      if (isActive) {
+        const grp = a.closest('.nav-group');
+        if (grp) grp.classList.remove('collapsed');
+      }
+    });
+  }
+
+  window.addEventListener('scroll', updateNav, { passive: true });
+  updateNav();
+
+  // Smooth scroll
+  navLinks.forEach(a => {
+    a.addEventListener('click', e => {
+      const target = document.getElementById(a.dataset.section);
+      if (target) {
+        e.preventDefault();
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    });
+  });
+
+  // ── Search / filter nav ──────────────────────────────────
+  function filterNav(query) {
+    const q = query.toLowerCase().trim();
+    const groups = document.querySelectorAll('.nav-group');
+    groups.forEach(grp => {
+      const links = grp.querySelectorAll('a[data-section]');
+      let anyVisible = false;
+      links.forEach(a => {
+        const match = !q || a.textContent.toLowerCase().includes(q);
+        a.style.display = match ? '' : 'none';
+        if (match) anyVisible = true;
+      });
+      // Show/hide the whole group and expand if search matches something
+      grp.style.display = anyVisible || !q ? '' : 'none';
+      if (q && anyVisible) grp.classList.remove('collapsed');
+    });
+  }
+</script>
+</body>
+</html>

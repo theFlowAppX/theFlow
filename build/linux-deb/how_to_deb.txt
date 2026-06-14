@@ -1,0 +1,124 @@
+=========================================================
+theFlow! — How to build and install the .deb package
+Ubuntu / Debian / Linux Mint (x86_64)
+=========================================================
+
+
+STEP 1 — Install system dependencies
+-------------------------------------
+sudo apt install python3-pip dpkg-dev
+sudo apt install libgl1 libgl1-mesa-glx
+
+
+STEP 2 — Install Python dependencies
+--------------------------------------
+pip3 install PyQt6 PyQt6-Qt6 PyQt6-sip pyinstaller Pillow
+
+
+STEP 3 — Make sure your project folder has this structure
+----------------------------------------------------------
+theflow/
+├── main.py
+├── rthook_theflow.py
+├── theflow.spec
+├── theflow.desktop
+├── theflow-mime.xml
+├── build_deb.sh
+├── backdrop.py
+├── config.py
+├── curve.py
+├── logo.py
+├── menu.py
+├── node.py
+├── note.py
+├── paint.py
+├── paint_on_canvas.py
+├── scene_logic.py
+├── settings.py
+├── ui_components.py
+├── utils.py
+├── view_logic.py
+├── logo/
+│   ├── logo.svg
+│   └── theFlow_white.svg
+├── icons/
+│   └── icon.png
+├── documentation/
+│   └── theFlow_manual.html
+└── settings/          <- create this if it doesn't exist
+
+
+STEP 4 — Create the settings folder if missing
+-----------------------------------------------
+mkdir -p settings
+
+
+STEP 5 — Build everything with one command
+-------------------------------------------
+bash build_deb.sh
+
+This will:
+  - Run PyInstaller with theflow.spec
+  - Create the .deb package structure
+  - Output: dist/theflow_0.1.0_amd64.deb
+
+
+STEP 6 — Install
+-----------------
+sudo dpkg -i dist/theflow_0.1.0_amd64.deb
+
+
+STEP 7 — Refresh icon cache
+-----------------------------
+sudo gtk-update-icon-cache -f -t /usr/share/icons/hicolor
+sudo update-desktop-database
+
+
+STEP 8 — Run it
+----------------
+theflow
+
+
+=========================================================
+UNINSTALL
+=========================================================
+sudo dpkg -r theflow
+
+
+=========================================================
+TROUBLESHOOTING
+=========================================================
+
+App does not launch
+  -> Run from terminal: theflow
+  -> Check error output
+
+Blank window or no display
+  -> QT_QPA_PLATFORM=xcb theflow
+
+Audio or video not playing
+  -> Do NOT rebuild with strip=True or upx=True
+  -> It corrupts the FFmpeg libraries inside the binary
+
+Missing libGL error
+  -> sudo apt install libgl1
+
+Icon not showing in launcher
+  -> sudo gtk-update-icon-cache -f /usr/share/icons/hicolor
+  -> sudo update-desktop-database
+
+.flow file opens empty scene when double-clicked
+  -> Check theflow.desktop has:  Exec=/usr/bin/theflow %f
+  -> Reinstall the .deb and run: sudo update-desktop-database
+
+Dialogs attached to main window when dragging
+  -> All QDialog instances must use None as parent on Linux
+
+
+=========================================================
+NOTES
+=========================================================
+
+- Settings are saved to: ~/.config/theflow/settings.json
+- The binary is large (~200-300 MB) because FFmpeg is bundled inside
+- Do NOT use UPX or strip — they corrupt the FFmpeg shared libraries

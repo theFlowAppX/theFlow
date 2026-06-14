@@ -1,0 +1,75 @@
+# =========================================================
+# theFlow! — .gitignore
+# =========================================================
+
+# ── PyInstaller build outputs ─────────────────────────────
+# dist/ folders inside each platform build folder
+build/*/dist/
+build/*/build/
+build/*/__pycache__/
+build/*/.venv_build/
+build/*/icon.iconset/
+*.spec.bak
+
+# ── Python cache ──────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+
+# ── Virtual environments ──────────────────────────────────
+.venv/
+.venv_build/
+venv/
+env/
+
+# ── macOS system files ────────────────────────────────────
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+
+# ── Windows system files ──────────────────────────────────
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── Linux system files ────────────────────────────────────
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# ── Icon build artifacts ──────────────────────────────────
+icon.iconset/
+*.icns
+icons/logo.ico
+
+# ── Playwright temp files ─────────────────────────────────
+/tmp/theflow_web_*.png
+
+# ── RPM build tree ────────────────────────────────────────
+~/rpmbuild/
+
+# ── User settings (personal, not for repo) ───────────────
+settings/settings.json
+
+# ── Editor / IDE ──────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+
+# ── Logs ─────────────────────────────────────────────────
+*.log
+
+# ── Compiled Python extensions ───────────────────────────
+*.so
+*.dylib

@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=theFlow!
+GenericName=Visual Canvas
+Comment=Visual node-based canvas for creative workflows
+Exec=/usr/bin/theflow
+Icon=theflow
+Terminal=false
+Type=Application
+Categories=Graphics;Office;Education;
+Keywords=canvas;nodes;flow;visual;creative;
+StartupWMClass=theflow
+StartupNotify=true
