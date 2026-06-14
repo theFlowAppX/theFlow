@@ -1,100 +1,99 @@
 # theFlow!
 
-A visual node-based canvas application for creative workflows.
+**Visual node-based canvas for organising ideas, media and information.**
 
-![theFlow!](logo/logo.svg)
+theFlow! is a free, open source desktop application that lets you place images, videos, audio, documents, and notes on an infinite canvas and connect them the way your mind naturally works.
 
-## Features
+![License](https://img.shields.io/badge/license-GPLv3-blue)
+![Version](https://img.shields.io/badge/version-0.1.0-green)
+![Platform](https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey)
 
-- Infinite canvas with node-based workflow
-- Text, Image, Movie, Audio, Document and Paint nodes
-- Backdrops and Sticky Notes for organisation
-- Dark and Light themes, fully customisable
-- Connect, group and visualise ideas in one place
+---
 
 ## Download
 
-Visit the [Download page](https://theFlowAppX.github.io/theFlow) or go to [Releases](https://github.com/theFlowAppX/theFlow/releases) to download the latest version for your platform.
+Visit **[www.theflowapp.org](https://www.theflowapp.org)** to download the latest release for your platform.
 
-| Platform | File |
-|----------|------|
-| macOS    | `theFlow-x.x.x.dmg` |
-| Windows  | `theFlow-x.x.x.exe` |
-| Linux (RPM) | `theFlow-x.x.x.rpm` |
-| Linux (DEB) | `theFlow-x.x.x.deb` |
+| Platform | Format |
+|---|---|
+| macOS | `.app` + `.dmg` |
+| Windows | `.exe` + installer |
+| Linux Ubuntu/Debian | `.deb` |
+| Linux Fedora/RHEL | `.rpm` |
 
-## Project Structure
+---
+
+## Features
+
+- Infinite freeform canvas with smooth zoom and pan
+- 7 node types: Text, Image, Movie, Audio, Document, Paint, Dot
+- Inline media viewers — video player, audio waveform, PDF viewer
+- Bézier connection curves between nodes
+- Backdrop grouping with child pinning
+- Canvas freehand annotation
+- Full undo/redo, copy/paste, import/export
+- Light and dark themes
+- `.flow` file format — JSON, human-readable
+- File association — double-click `.flow` files to open directly
+
+---
+
+## Repository Structure
 
 ```
 theFlow/
-├── src/                    ← Python source files
-│   ├── main.py
-│   ├── main_linux.py
-│   ├── view_logic.py
-│   ├── scene_logic.py
-│   ├── node.py
-│   ├── note.py
-│   ├── backdrop.py
-│   ├── paint.py
-│   ├── curve.py
-│   ├── menu.py
-│   ├── ui_components.py
-│   ├── settings.py
-│   ├── config.py
-│   ├── utils.py
-│   └── logo.py
 ├── build/
-│   ├── mac/                ← macOS build scripts
-│   ├── win/                ← Windows build scripts
-│   ├── linux-rpm/          ← Linux RPM build scripts
-│   └── linux-deb/          ← Linux DEB build scripts
-├── logo/                   ← App logo SVG
-├── documentation/          ← User manual
+│   ├── mac/          ← macOS build scripts and source
+│   ├── win/          ← Windows build scripts and source
+│   ├── linux-deb/    ← Linux DEB build scripts and source
+│   └── linux-rpm/    ← Linux RPM build scripts and source
+├── .gitignore
 └── README.md
 ```
 
+---
+
 ## Building from Source
 
-### Requirements
-- Python 3.10+
-- PyQt6
-- PyInstaller
+Each platform folder contains everything needed to build theFlow! for that platform.
 
-### macOS
+**macOS**
 ```bash
 cd build/mac
 chmod +x build_mac.sh
 ./build_mac.sh
 ```
 
-### Windows
-```bash
-cd build/win
-pyinstaller theflow_win.spec
+**Windows**
+```
+cd build\win
+build_windows.bat
 ```
 
-### Linux RPM
+**Linux DEB**
+```bash
+cd build/linux-deb
+chmod +x setup_ubuntu.sh && ./setup_ubuntu.sh   # first time only
+./build_deb.sh
+```
+
+**Linux RPM**
 ```bash
 cd build/linux-rpm
 chmod +x build_rpm.sh
 ./build_rpm.sh
 ```
 
-### Linux DEB
-```bash
-cd build/linux-deb
-chmod +x build_deb.sh
-./build_deb.sh
-```
+---
 
 ## License
 
-GPLv3 — see [LICENSE](LICENSE)
+theFlow! is free and open source software released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
 
-## Contact
+---
 
-theflowapp@protonmail.com
+## Links
 
-## Author
-
-Xavier Garès © 2026
+- 🌐 [www.theflowapp.org](https://www.theflowapp.org)
+- 🎥 [YouTube](https://www.youtube.com/@theFlowapplication)
+- 📧 theflow!@protonmail.com
