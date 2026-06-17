@@ -1,6 +1,6 @@
 Name:           theflow
 Version:        0.1.0
-Release:        1%{?dist}
+Release:        1
 Summary:        theFlow! — Visual Canvas Application
 License:        GPLv3
 URL:            https://github.com/xaviergares/theflow
@@ -13,11 +13,16 @@ Source0:        theflow-%{version}.tar.gz
 # Icon and desktop file (kept in the project root)
 Source1:        icons/icon.png
 Source2:        theflow.desktop
+Source3:        theFlow_manual.html
+Source4:        theflow-mime.xml
 
 BuildArch:      x86_64
 
 # PyInstaller bundles everything — no Python/Qt deps needed at runtime
 AutoReqProv:    no
+
+# Disable debug package — no source files to debug
+%global debug_package %{nil}
 
 %description
 theFlow! is a visual node-based canvas application for organising
@@ -41,16 +46,22 @@ install -Dm755 theflow %{buildroot}/usr/bin/theflow
 # Icon  (256×256 PNG)
 install -Dm644 %{SOURCE1} %{buildroot}/usr/share/icons/hicolor/256x256/apps/theflow.png
 
+# MIME type XML
+install -Dm644 %{SOURCE4} %{buildroot}/usr/share/mime/packages/theflow.xml
+
 # Desktop entry
 install -Dm644 %{SOURCE2} %{buildroot}/usr/share/applications/theflow.desktop
 
+# MIME type icon — named after the MIME type so file manager shows it
+install -Dm644 %{SOURCE1} %{buildroot}/usr/share/icons/hicolor/256x256/mimetypes/application-x-theflow.png
+
 # Documentation
-install -Dm644 %{_sourcedir}/../documentation/theFlow_manual.html \
-               %{buildroot}/usr/share/doc/theflow/theFlow_manual.html
+install -Dm644 %{SOURCE3} %{buildroot}/usr/share/doc/theflow/theFlow_manual.html
 
 # ── Post-install: refresh icon cache & desktop DB ─────────────────
 %post
 /usr/bin/update-desktop-database &>/dev/null || :
+/usr/bin/update-mime-database /usr/share/mime &>/dev/null || :
 /usr/bin/gtk-update-icon-cache -f -t /usr/share/icons/hicolor &>/dev/null || :
 
 %postun
@@ -59,10 +70,11 @@ install -Dm644 %{_sourcedir}/../documentation/theFlow_manual.html \
 
 # ── File manifest ─────────────────────────────────────────────────
 %files
-%license /usr/share/doc/theflow/theFlow_manual.html
 /usr/bin/theflow
 /usr/share/icons/hicolor/256x256/apps/theflow.png
+/usr/share/icons/hicolor/256x256/mimetypes/application-x-theflow.png
 /usr/share/applications/theflow.desktop
+/usr/share/mime/packages/theflow.xml
 %dir /usr/share/doc/theflow
 /usr/share/doc/theflow/theFlow_manual.html
 

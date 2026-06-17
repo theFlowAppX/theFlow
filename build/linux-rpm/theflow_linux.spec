@@ -40,7 +40,7 @@ if os.path.isfile(_mm_plugin):
     _ffmpeg_libs.append((_mm_plugin, 'PyQt6/Qt6/plugins/multimedia'))
 
 a = Analysis(
-    ['main_linux.py'],
+    ['main.py'],
     pathex=['.'],
     binaries=_ffmpeg_libs,
     datas=[
@@ -61,7 +61,7 @@ a = Analysis(
         'paint_on_canvas',
     ],
     hookspath=[],
-    runtime_hooks=['rthook_linux.py'],
+    runtime_hooks=['rthook.py'],
     excludes=[
         'tkinter',
         'matplotlib',

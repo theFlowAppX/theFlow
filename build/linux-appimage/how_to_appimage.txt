@@ -1,0 +1,202 @@
+=========================================================
+theFlow! — How to build and install the AppImage
+Any Linux x86_64 (Ubuntu 20.04+, Fedora 38+, Arch, etc.)
+=========================================================
+
+
+QUICK BUILD (recommended)
+--------------------------
+The build script handles everything automatically:
+
+    chmod +x build_appimage.sh
+    ./build_appimage.sh
+
+Output:
+    dist/theflow                                  ← binary
+    dist/theFlow-0.1.0-x86_64.AppImage           ← portable installer
+
+
+INSTALL
+-------
+No installation needed. Just make it executable and run:
+
+    chmod +x dist/theFlow-0.1.0-x86_64.AppImage
+    ./dist/theFlow-0.1.0-x86_64.AppImage
+
+Optional — integrate into the system launcher:
+
+    sudo cp dist/theFlow-0.1.0-x86_64.AppImage /usr/local/bin/theflow
+    sudo chmod +x /usr/local/bin/theflow
+
+Run:
+    theflow
+
+
+UNINSTALL
+---------
+Delete the AppImage file. No system files are touched.
+
+    rm dist/theFlow-0.1.0-x86_64.AppImage
+
+If you copied it to /usr/local/bin:
+
+    sudo rm /usr/local/bin/theflow
+
+
+=========================================================
+MANUAL BUILD (step by step)
+=========================================================
+
+
+STEP 1 — Install system dependencies
+--------------------------------------
+Ubuntu/Debian:
+    sudo apt-get install python3 python3-pip libgl1 libglib2.0-0 fuse
+
+Fedora/RHEL:
+    sudo dnf install python3 python3-pip libGL fuse fuse-libs
+
+
+STEP 2 — Install Python dependencies
+--------------------------------------
+    pip3 install pyinstaller "PyQt6==6.4.2" "PyQt6-Qt6==6.4.2" "PyQt6-sip>=13.4" Pillow cairosvg
+
+NOTE: PyQt6 is pinned to 6.4.2 for compatibility with older CPUs.
+      It runs correctly on all modern machines.
+      cairosvg is required to convert logo/logo.svg to theflow.png.
+
+
+STEP 3 — Project folder structure
+----------------------------------------------------------
+theflow/
+├── main_linux.py
+├── rthook_linux.py
+├── theflow_linux.spec   ← PyInstaller spec
+├── theflow.desktop
+├── build_appimage.sh
+├── convert_icon_linux.py
+├── backdrop.py
+├── config.py
+├── curve.py
+├── logo.py
+├── menu.py
+├── node.py
+├── note.py
+├── paint.py
+├── paint_on_canvas.py
+├── scene_logic.py
+├── settings.py
+├── ui_components.py
+├── utils.py
+├── view_logic.py
+├── logo/
+│   └── logo.svg
+├── icons/
+│   └── icon.png
+├── documentation/
+│   └── theFlow_manual.html
+└── settings/
+
+
+STEP 4 — Convert the icon (first time only)
+---------------------------------------------
+    python3 convert_icon_linux.py
+
+Creates: theflow.png (256x256 RGBA)
+
+
+STEP 5 — Build the binary
+--------------------------
+    python3 -m PyInstaller theflow_linux.spec
+
+Output: dist/theflow
+
+
+STEP 6 — Download appimagetool
+--------------------------------
+    curl -L -o appimagetool-x86_64.AppImage \
+        "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
+    chmod +x appimagetool-x86_64.AppImage
+
+
+STEP 7 — Create AppDir structure
+----------------------------------
+    mkdir -p theFlow.AppDir/usr/bin
+    mkdir -p theFlow.AppDir/usr/share/icons/hicolor/256x256/apps
+    mkdir -p theFlow.AppDir/usr/share/applications
+
+    cp dist/theflow          theFlow.AppDir/usr/bin/theflow
+    cp icons/icon.png        theFlow.AppDir/usr/share/icons/hicolor/256x256/apps/theflow.png
+    cp icons/icon.png        theFlow.AppDir/theflow.png
+    cp theflow.desktop       theFlow.AppDir/theflow.desktop
+    cp theflow.desktop       theFlow.AppDir/usr/share/applications/theflow.desktop
+
+
+STEP 8 — Create AppRun entrypoint
+-----------------------------------
+    cat > theFlow.AppDir/AppRun << 'EOF'
+    #!/bin/bash
+    SELF=$(readlink -f "$0")
+    HERE=$(dirname "$SELF")
+    export PATH="$HERE/usr/bin:$PATH"
+    export LD_LIBRARY_PATH="$HERE/usr/lib:$LD_LIBRARY_PATH"
+    exec "$HERE/usr/bin/theflow" "$@"
+    EOF
+    chmod +x theFlow.AppDir/AppRun
+
+
+STEP 9 — Build the AppImage
+-----------------------------
+    mkdir -p dist
+    ARCH=x86_64 ./appimagetool-x86_64.AppImage theFlow.AppDir dist/theFlow-0.1.0-x86_64.AppImage
+    chmod +x dist/theFlow-0.1.0-x86_64.AppImage
+
+
+=========================================================
+TROUBLESHOOTING
+=========================================================
+
+App does not launch
+    -> Run from terminal: ./theFlow-0.1.0-x86_64.AppImage
+    -> Check error output
+
+Blank window or no display
+    -> QT_QPA_PLATFORM=xcb ./theFlow-0.1.0-x86_64.AppImage
+
+FUSE not available (common in containers / WSL)
+    -> Extract and run without FUSE:
+       ./theFlow-0.1.0-x86_64.AppImage --appimage-extract
+       ./squashfs-root/AppRun
+
+Incompatible processor / SSE4.2 error
+    -> Downgrade PyQt6: pip3 install "PyQt6==6.4.2" "PyQt6-Qt6==6.4.2" --force-reinstall
+    -> Rebuild
+
+Audio or video not playing
+    -> Do NOT use strip=True or upx=True in theflow_linux.spec — corrupts bundled FFmpeg libraries
+
+Missing libGL error
+    -> Ubuntu: sudo apt-get install libgl1
+    -> Fedora:  sudo dnf install mesa-libGL
+
+Icon not showing in launcher (after system integration)
+    -> sudo gtk-update-icon-cache -f /usr/share/icons/hicolor
+    -> sudo update-desktop-database
+
+appimagetool download fails
+    -> Download manually from:
+       https://github.com/AppImage/AppImageKit/releases
+    -> Place appimagetool-x86_64.AppImage in the project root
+
+
+=========================================================
+NOTES
+=========================================================
+
+- Settings saved to: ~/.config/theflow/settings.json
+- Binary is ~200–300 MB (FFmpeg bundled inside)
+- Do NOT use UPX or strip — they corrupt FFmpeg shared libraries
+- The same dist/theflow binary is used for both RPM, DEB, and AppImage
+- PyQt6 6.4.2 is used for broad CPU compatibility
+- AppImage requires FUSE on the host; most desktop Linux distros have it
+- The AppImage is fully portable: copy it to any x86_64 Linux machine and run
