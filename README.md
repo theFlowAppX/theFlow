@@ -20,6 +20,7 @@ Visit **[www.theflowapp.org](https://www.theflowapp.org)** to download the lates
 | Windows | `.exe` + installer |
 | Linux Ubuntu/Debian | `.deb` |
 | Linux Fedora/RHEL | `.rpm` |
+| Linux AppImage | `.AppImage` (portable, any distro) |
 
 ---
 
@@ -46,7 +47,8 @@ theFlow/
 │   ├── mac/          ← macOS build scripts and source
 │   ├── win/          ← Windows build scripts and source
 │   ├── linux-deb/    ← Linux DEB build scripts and source
-│   └── linux-rpm/    ← Linux RPM build scripts and source
+│   ├── linux-rpm/    ← Linux RPM build scripts and source
+│   └── linux-appimage/ ← Linux AppImage build scripts and source
 ├── .gitignore
 └── README.md
 ```
@@ -82,6 +84,13 @@ chmod +x setup_ubuntu.sh && ./setup_ubuntu.sh   # first time only
 cd build/linux-rpm
 chmod +x build_rpm.sh
 ./build_rpm.sh
+```
+
+**Linux AppImage**
+```bash
+cd build/linux-appimage
+chmod +x build_appimage.sh
+./build_appimage.sh
 ```
 
 ---
