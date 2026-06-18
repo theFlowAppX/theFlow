@@ -348,7 +348,11 @@ class View(QGraphicsView):
     def _scene_ctx_for(self, view_event, item):
         from PyQt6.QtCore import QPointF, QPoint
         # globalPosition() is the PyQt6 way; toPoint() gives QPoint for menu.exec()
-        gp = view_event.globalPosition().toPoint()
+        # QContextMenuEvent uses globalPos(); QMouseEvent uses globalPosition()
+        if hasattr(view_event, 'globalPosition'):
+            gp = view_event.globalPosition().toPoint()
+        else:
+            gp = view_event.globalPos()
         sp = self.mapToScene(view_event.pos())
         class _Ctx:
             _sp  = sp
