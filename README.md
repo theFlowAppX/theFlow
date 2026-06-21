@@ -110,22 +110,6 @@ theFlow! has no visibility into how you use it, what you store, or who you are.
 
 ---
 
-## Security
-
-All binaries are scanned and verified. Independent analysis reports:
-
-| Binary | Report |
-|---|---|
-| macOS `.dmg` | [Hybrid Analysis](https://hybrid-analysis.com/sample/e7a8a960fbc8f3a1efe846a5a745984ea087d6e604a03f2776caf1ff7b14e797) |
-| Windows `.exe` | [Hybrid Analysis](https://hybrid-analysis.com/sample/0ef820d434dbbe89555eb19eda70abafa02cb0b8e313274249fb13944979239b) |
-| Linux `.deb` | [Hybrid Analysis](https://hybrid-analysis.com/sample/32c8af3ce6575a37f72c90406df188954b439d963656195b543d2a751ec2af39) |
-| Linux `.rpm` | [Hybrid Analysis](https://hybrid-analysis.com/sample/e0e7a8f3e97c99756f54f77d4f2b5636919f031368551138adeef4a25252db24) |
-| Linux `.AppImage` | [Hybrid Analysis](https://hybrid-analysis.com/sample/22e62dc78d5e5063076a566242b9e221a664f87c076e17b78b803cd4049f7d5d/6a340978efc7c344180f9007) |
-
-Any flags from obscure AV engines are false positives typical of PyInstaller-built binaries. Major engines (Bitdefender, Sophos, ESET, SentinelOne, ClamAV, Avira, Emsisoft) all return clean.
-
----
-
 ## License
 
 theFlow! is free and open source software released under the [GNU General Public License v3.0](https://www.gnu.org/licenses/gpl-3.0.html).
