@@ -26,6 +26,7 @@ a = Analysis(
         # NOTE: logo/F!.png must live next to theFlow.exe (not inside _MEIPASS)
         # so InlineDocViewer can find it via sys.executable at runtime.
         # It is copied by the post_build() step at the bottom of this file.
+        ('icons',                            'icons'),
         ('settings',                         'settings'),
         ('documentation/theFlow_manual.html','documentation'),
         *pyqt6_datas,

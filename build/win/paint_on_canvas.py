@@ -521,14 +521,17 @@ class CanvasPainter:
             return
         tb = self._toolbar
 
+        # Windows requires cursor pixmaps to be exactly 32x32.
+        CURSOR_SIZE = 32
+
         if self.mode == "draw":
             if tb and os.path.exists(tb._pencil_path):
-                cur = _cursor_from_svg(tb._pencil_path, 32, 2, 30)
+                cur = _cursor_from_svg(tb._pencil_path, CURSOR_SIZE, 2, CURSOR_SIZE - 2)
             else:
                 cur = QCursor(Qt.CursorShape.CrossCursor)
         elif self.mode == "erase":
             if tb and os.path.exists(tb._eraser_path):
-                cur = _cursor_from_svg(tb._eraser_path, 32, 2, 30)
+                cur = _cursor_from_svg(tb._eraser_path, CURSOR_SIZE, 2, CURSOR_SIZE - 2)
             else:
                 cur = QCursor(Qt.CursorShape.ForbiddenCursor)
         else:
@@ -536,6 +539,10 @@ class CanvasPainter:
 
         self._view.viewport().setCursor(cur)
         self._view.setCursor(cur)
+        # Force Windows to pick up the new cursor immediately
+        from PyQt6.QtWidgets import QApplication
+        QApplication.setOverrideCursor(cur)
+        QApplication.restoreOverrideCursor()
 
     # ── Mouse event handlers ──────────────────────────────────────────
 
